@@ -1,12 +1,12 @@
 """
 Celery tasks for platform integration and syncing
 """
-from backend.tasks.celery_app import celery_app
-from backend.models.database import SessionLocal, PlatformListing
+from tasks.celery_app import celery_app
+from models.database import SessionLocal, PlatformListing
 from datetime import datetime
 
 
-@celery_app.task(name='backend.tasks.platform_tasks.sync_listings_task')
+@celery_app.task(name='tasks.platform_tasks.sync_listings_task')
 def sync_listings_task():
     """
     Sync listing status and metrics from all platforms
@@ -48,15 +48,15 @@ def sync_listings_task():
         db.close()
 
 
-@celery_app.task(name='backend.tasks.platform_tasks.post_product_to_platform')
+@celery_app.task(name='tasks.platform_tasks.post_product_to_platform')
 def post_product_to_platform_task(product_id: int, platform_name: str):
     """
     Background task to post a product to a specific platform
     """
     db = SessionLocal()
     try:
-        from backend.models.database import Product
-        from backend.services.platform_integrations.platform_manager import PlatformManager
+        from models.database import Product
+        from services.platform_integrations.platform_manager import PlatformManager
 
         product = db.query(Product).filter(Product.id == product_id).first()
         if not product:

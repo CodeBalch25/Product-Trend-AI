@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import enum
 
-from backend.config.settings import settings
+from config.settings import settings
 
 Base = declarative_base()
 
@@ -70,7 +70,7 @@ class Product(Base):
     potential_margin = Column(Float)
 
     # Status & Workflow
-    status = Column(Enum(ProductStatus), default=ProductStatus.DISCOVERED)
+    status = Column(Enum(ProductStatus, values_callable=lambda x: [e.value for e in x]), default=ProductStatus.DISCOVERED)
     approved_by_user = Column(Boolean, default=False)
     rejection_reason = Column(Text)
 
@@ -82,8 +82,11 @@ class Product(Base):
     discovered_at = Column(DateTime, default=datetime.utcnow)
     analyzed_at = Column(DateTime)
     approved_at = Column(DateTime)
+    rejected_at = Column(DateTime)  # Track when product was rejected (for learning)
     posted_at = Column(DateTime)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    scan_id = Column(String(50))  # Track which scan found this product
+    is_new = Column(Boolean, default=True)  # Mark as new for current scan
 
 
 class TrendSource(Base):
@@ -115,7 +118,7 @@ class PlatformListing(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     product_id = Column(Integer, nullable=False)
-    platform = Column(Enum(Platform), nullable=False)
+    platform = Column(Enum(Platform, values_callable=lambda x: [e.value for e in x]), nullable=False)
 
     # Platform-specific data
     platform_listing_id = Column(String(200))
@@ -160,4 +163,33 @@ def get_db():
 
 def init_db():
     """Initialize database tables"""
-    Base.metadata.create_all(bind=engine)
+    print("\n" + "="*60)
+    print("🔧 INITIALIZING DATABASE")
+    print("="*60)
+
+    try:
+        print(f"Database URL: {settings.DATABASE_URL}")
+        print("Creating tables...")
+
+        # Test connection first
+        with engine.connect() as conn:
+            print("✓ Database connection successful!")
+
+        # Create all tables
+        Base.metadata.create_all(bind=engine)
+
+        # Verify tables were created
+        from sqlalchemy import inspect
+        inspector = inspect(engine)
+        tables = inspector.get_table_names()
+
+        print(f"✓ Tables created: {', '.join(tables)}")
+        print("="*60 + "\n")
+
+        return True
+
+    except Exception as e:
+        print(f"✗ Database initialization failed!")
+        print(f"  Error: {str(e)}")
+        print("="*60 + "\n")
+        raise

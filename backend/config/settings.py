@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     FACEBOOK_ACCESS_TOKEN: Optional[str] = None
 
     # AI Services
+    GROQ_API_KEY: Optional[str] = None  # FREE & FAST - Recommended
+    HUGGINGFACE_API_KEY: Optional[str] = None  # FREE - Alternative
     OPENAI_API_KEY: Optional[str] = None
     ANTHROPIC_API_KEY: Optional[str] = None
 

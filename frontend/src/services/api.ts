@@ -7,6 +7,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 seconds default
 });
 
 // Product APIs
@@ -30,7 +31,7 @@ export const productApi = {
 // Trend APIs
 export const trendApi = {
   scan: () =>
-    api.post('/api/trends/scan'),
+    api.post('/api/trends/scan', {}, { timeout: 60000 }), // 60 seconds for scan (it takes time!)
 
   getSources: () =>
     api.get('/api/trends/sources'),
@@ -40,6 +41,18 @@ export const trendApi = {
 export const analyticsApi = {
   getDashboard: () =>
     api.get('/api/analytics/dashboard'),
+
+  getRejections: () =>
+    api.get('/api/analytics/rejections'),
+};
+
+// ML APIs
+export const mlApi = {
+  trainModel: () =>
+    api.post('/api/ml/train'),
+
+  getStatus: () =>
+    api.get('/api/ml/status'),
 };
 
 export default api;

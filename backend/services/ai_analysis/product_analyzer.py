@@ -1,19 +1,66 @@
 """
 AI-powered product analysis service
+Now using Multi-Agent AI System for enhanced analysis
 """
 from typing import Dict, Any, Optional
 from datetime import datetime
 import json
 
-from backend.config.settings import settings
+from config.settings import settings
+from services.ml.approval_predictor import ml_predictor
+from models.database import ProductStatus
 
 
 class ProductAnalyzer:
-    """Analyzes products using AI to generate descriptions, categorize, and score"""
+    """Analyzes products using AI - now with Multi-Agent System"""
 
     def __init__(self):
+        # Check if agentic system is available (priority)
+        self.agentic_enabled = bool(settings.GROQ_API_KEY and settings.HUGGINGFACE_API_KEY)
+
+        self.groq_enabled = bool(settings.GROQ_API_KEY)
+        self.huggingface_enabled = bool(settings.HUGGINGFACE_API_KEY)
         self.openai_enabled = bool(settings.OPENAI_API_KEY)
         self.anthropic_enabled = bool(settings.ANTHROPIC_API_KEY)
+
+        # Initialize Multi-Agent System (TOP PRIORITY)
+        if self.agentic_enabled:
+            try:
+                from services.ai_analysis.agentic_system import AgenticAISystem
+                self.agentic_system = AgenticAISystem(
+                    groq_api_key=settings.GROQ_API_KEY,
+                    huggingface_api_key=settings.HUGGINGFACE_API_KEY
+                )
+                print("="*60)
+                print("🤖 MULTI-AGENT AI SYSTEM ACTIVATED 🤖")
+                print("  ✓ Coordinator: Qwen (via Groq)")
+                print("  ✓ Scanner Agent: Mixtral-8x7B (Hugging Face)")
+                print("  ✓ Trend Agent: Mistral-7B (Hugging Face)")
+                print("  ✓ Research Agent: Llama-3-8B (Hugging Face)")
+                print("="*60)
+            except Exception as e:
+                print(f"Failed to initialize agentic system: {str(e)}")
+                self.agentic_enabled = False
+
+        # Groq setup (FREE & FAST - Fallback)
+        if self.groq_enabled and not self.agentic_enabled:
+            try:
+                from openai import OpenAI
+                self.groq_client = OpenAI(
+                    api_key=settings.GROQ_API_KEY,
+                    base_url="https://api.groq.com/openai/v1"
+                )
+                print("Groq API enabled (FREE & FAST)")
+            except ImportError:
+                print("OpenAI library not installed for Groq")
+                self.groq_enabled = False
+
+        # Hugging Face setup (FREE - Alternative)
+        if self.huggingface_enabled and not self.agentic_enabled:
+            self.hf_api_key = settings.HUGGINGFACE_API_KEY
+            self.hf_api_url = "https://api-inference.huggingface.co/models/"
+            self.hf_model = "mistralai/Mistral-7B-Instruct-v0.1"  # Free model
+            print("Hugging Face API enabled (FREE)")
 
         if self.openai_enabled:
             try:
@@ -31,9 +78,10 @@ class ProductAnalyzer:
                 print("Anthropic library not installed")
                 self.anthropic_enabled = False
 
-    async def analyze_product(self, product) -> Dict[str, Any]:
+    async def analyze_product(self, product, db=None) -> Dict[str, Any]:
         """
-        Comprehensive product analysis using AI
+        Comprehensive product analysis using AI with ML-enhanced predictions
+        Priority: Multi-Agent System > Individual AI Services > Rule-based
         """
         analysis = {
             "ai_category": None,
@@ -43,24 +91,219 @@ class ProductAnalyzer:
             "competition_level": "unknown",
             "suggested_price": None,
             "target_audience": None,
-            "selling_points": []
+            "selling_points": [],
+            "recommendation": "review"  # Default recommendation
         }
 
         try:
-            # Generate AI analysis
-            if self.anthropic_enabled:
+            # STEP 1: Multi-Agent AI Analysis
+            if self.agentic_enabled:
+                print("\n🚀 Using Multi-Agent AI System for analysis...")
+                analysis = await self.agentic_system.analyze_product_multi_agent(product)
+                print("✓ Multi-Agent analysis complete\n")
+
+            # FALLBACK: Single AI services
+            elif self.groq_enabled:
+                print("Using Groq (single agent)...")
+                analysis = await self._analyze_with_groq(product)
+            elif self.huggingface_enabled:
+                print("Using Hugging Face (single agent)...")
+                analysis = await self._analyze_with_huggingface(product)
+            elif self.anthropic_enabled:
+                print("Using Claude (single agent)...")
                 analysis = await self._analyze_with_claude(product)
             elif self.openai_enabled:
+                print("Using GPT-4 (single agent)...")
                 analysis = await self._analyze_with_gpt(product)
             else:
-                # Fallback to rule-based analysis
+                print("Using rule-based analysis (no AI available)...")
                 analysis = self._basic_analysis(product)
+
+            # STEP 2: ML Approval Prediction (if model trained)
+            if ml_predictor.trained:
+                product_features = {
+                    "trend_score": product.trend_score or 0,
+                    "category": analysis.get("ai_category") or product.category or "unknown",
+                    "source": product.trend_source or "unknown",
+                    "price": product.estimated_cost or 0,
+                    "keywords": analysis.get("ai_keywords", [])
+                }
+
+                ml_prediction = ml_predictor.predict(product_features)
+
+                print(f"\n🤖 ML PREDICTION:")
+                print(f"   Approval Probability: {ml_prediction['approval_probability']:.1%}")
+                print(f"   Prediction: {ml_prediction['prediction'].upper()}")
+                print(f"   Confidence: {ml_prediction['confidence']:.1%}")
+                print(f"   Reasoning: {ml_prediction['reasoning']}")
+
+                # STEP 3: Combine AI + ML for final decision
+                ai_recommendation = analysis.get('recommendation', 'review')
+
+                # Auto-reject logic: ML is very confident about rejection
+                if ml_prediction['approval_probability'] < 0.2 and ml_prediction['confidence'] > 0.7:
+                    print(f"   ⚠️ ML predicts high rejection probability - flagging for review")
+                    if db and product:
+                        product.status = ProductStatus.PENDING_REVIEW
+                        product.ml_warning = True
+
+                # Auto-approval logic: ML + AI both highly confident
+                elif (ml_prediction['approval_probability'] > 0.85 and
+                      ml_prediction['confidence'] > 0.8 and
+                      ai_recommendation == 'approve'):
+                    print(f"   ✅ ML + AI both highly confident - AUTO-APPROVING")
+                    if db and product:
+                        product.status = ProductStatus.APPROVED
+                        product.auto_approved = True
+
+                # Store ML prediction for audit
+                analysis['ml_prediction'] = ml_prediction
 
         except Exception as e:
             print(f"AI analysis error: {str(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
             analysis = self._basic_analysis(product)
 
         return analysis
+
+    async def _analyze_with_groq(self, product) -> Dict[str, Any]:
+        """Analyze product using Groq (FREE & FAST)"""
+        try:
+            prompt = f"""Analyze this product for e-commerce listing:
+
+Title: {product.title}
+Description: {product.description or 'N/A'}
+Category: {product.category or 'Unknown'}
+Trend Score: {product.trend_score}
+
+Provide JSON response ONLY with:
+{{
+  "category": "optimized category",
+  "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+  "description": "compelling 2-3 sentence product description",
+  "profit_potential": 75,
+  "competition_level": "medium",
+  "price_range": "$30-$50",
+  "target_audience": "tech enthusiasts",
+  "selling_points": ["point1", "point2", "point3"]
+}}"""
+
+            response = self.groq_client.chat.completions.create(
+                model="llama-3.3-70b-versatile",  # Fast & accurate (updated model)
+                messages=[
+                    {"role": "system", "content": "You are an expert e-commerce product analyst. Always respond with valid JSON only."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=500
+            )
+
+            result_text = response.choices[0].message.content.strip()
+
+            # Parse JSON response
+            try:
+                # Extract JSON if embedded in markdown code blocks
+                if "```json" in result_text:
+                    json_str = result_text.split("```json")[1].split("```")[0].strip()
+                elif "```" in result_text:
+                    json_str = result_text.split("```")[1].split("```")[0].strip()
+                elif "{" in result_text and "}" in result_text:
+                    json_str = result_text[result_text.find("{"):result_text.rfind("}")+1]
+                else:
+                    json_str = result_text
+
+                result = json.loads(json_str)
+            except:
+                # Fallback if JSON parsing fails
+                return self._basic_analysis(product)
+
+            return {
+                "ai_category": result.get("category"),
+                "ai_keywords": result.get("keywords", [])[:10],
+                "ai_description": result.get("description"),
+                "profit_potential_score": float(result.get("profit_potential", 50)),
+                "competition_level": result.get("competition_level", "medium"),
+                "suggested_price": result.get("price_range"),
+                "target_audience": result.get("target_audience"),
+                "selling_points": result.get("selling_points", [])
+            }
+
+        except Exception as e:
+            print(f"Groq analysis error: {str(e)}")
+            return self._basic_analysis(product)
+
+    async def _analyze_with_huggingface(self, product) -> Dict[str, Any]:
+        """Analyze product using Hugging Face (FREE)"""
+        import requests
+
+        try:
+            prompt = f"""Analyze this product for e-commerce:
+Title: {product.title}
+Description: {product.description or 'N/A'}
+Category: {product.category or 'Unknown'}
+
+Provide JSON with: category, keywords (array), description, profit_potential (0-100), competition_level (low/medium/high), price_range, target_audience, selling_points (array)"""
+
+            headers = {"Authorization": f"Bearer {self.hf_api_key}"}
+            payload = {
+                "inputs": prompt,
+                "parameters": {
+                    "max_new_tokens": 500,
+                    "temperature": 0.7,
+                    "return_full_text": False
+                }
+            }
+
+            response = requests.post(
+                f"{self.hf_api_url}{self.hf_model}",
+                headers=headers,
+                json=payload,
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                result_text = response.json()[0]["generated_text"]
+
+                # Try to parse JSON from response
+                try:
+                    # Extract JSON if embedded in text
+                    if "{" in result_text and "}" in result_text:
+                        json_str = result_text[result_text.find("{"):result_text.rfind("}")+1]
+                        result = json.loads(json_str)
+                    else:
+                        # Fallback: create structured response from text
+                        result = {
+                            "category": product.category or "General",
+                            "keywords": [w for w in product.title.lower().split() if len(w) > 3][:10],
+                            "description": result_text[:500],
+                            "profit_potential": 65,
+                            "competition_level": "medium",
+                            "price_range": "$20-$50",
+                            "target_audience": "General consumers",
+                            "selling_points": ["Quality product", "Trending item", "Great value"]
+                        }
+                except:
+                    result = self._basic_analysis(product)
+                    return result
+
+                return {
+                    "ai_category": result.get("category"),
+                    "ai_keywords": result.get("keywords", []),
+                    "ai_description": result.get("description"),
+                    "profit_potential_score": float(result.get("profit_potential", 50)),
+                    "competition_level": result.get("competition_level", "medium"),
+                    "suggested_price": result.get("price_range"),
+                    "target_audience": result.get("target_audience"),
+                    "selling_points": result.get("selling_points", [])
+                }
+            else:
+                print(f"Hugging Face API error: {response.status_code}")
+                return self._basic_analysis(product)
+
+        except Exception as e:
+            print(f"Hugging Face analysis error: {str(e)}")
+            return self._basic_analysis(product)
 
     async def _analyze_with_claude(self, product) -> Dict[str, Any]:
         """Analyze product using Claude AI"""

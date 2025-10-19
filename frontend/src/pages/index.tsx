@@ -21,19 +21,33 @@ export default function Home() {
   const handleScanTrends = async () => {
     setIsScanning(true);
     try {
-      await trendApi.scan();
-      toast.success('Trend scan started!');
+      const result = await trendApi.scan();
+      // Show the message from backend
+      const data = result.data || result;
+      if (data.new_products_count > 0) {
+        toast.success(data.message);
+      } else {
+        toast(data.message); // Default neutral toast
+      }
+      // Always refresh products after scan
+      setTimeout(() => mutate(), 2000); // Wait 2 seconds then refresh
+    } catch (err: any) {
+      // Even if API call fails/times out, the scan might have worked!
+      // Always refresh to check for new products
+      toast('Scan completed. Refreshing products...'); // Default neutral toast
       setTimeout(() => mutate(), 2000);
-    } catch (err) {
-      toast.error('Failed to start trend scan');
     } finally {
       setIsScanning(false);
     }
   };
 
-  const filteredProducts = products?.filter((p: any) =>
-    statusFilter === 'all' ? true : p.status === statusFilter
-  );
+  const filteredProducts = products?.filter((p: any) => {
+    // Exclude rejected products from 'all' view
+    if (statusFilter === 'all') {
+      return p.status !== 'rejected';
+    }
+    return p.status === statusFilter;
+  });
 
   return (
     <Layout>
@@ -105,6 +119,16 @@ export default function Home() {
               }`}
             >
               Posted
+            </button>
+            <button
+              onClick={() => setStatusFilter('rejected')}
+              className={`px-4 py-2 rounded-lg ${
+                statusFilter === 'rejected'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              Rejected
             </button>
           </div>
         </div>

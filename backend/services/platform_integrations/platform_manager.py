@@ -4,9 +4,9 @@ Platform integration manager for posting to multiple marketplaces
 from typing import List, Dict, Any
 from datetime import datetime
 
-from backend.models.database import PlatformListing, Platform, ProductStatus
-from backend.config.settings import settings
-from backend.services.ai_analysis.product_analyzer import ProductAnalyzer
+from models.database import PlatformListing, Platform, ProductStatus
+from config.settings import settings
+from services.ai_analysis.product_analyzer import ProductAnalyzer
 
 
 class PlatformManager:

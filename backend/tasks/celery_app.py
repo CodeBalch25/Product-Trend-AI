@@ -3,7 +3,7 @@ Celery configuration for background tasks
 """
 from celery import Celery
 from celery.schedules import crontab
-from backend.config.settings import settings
+from config.settings import settings
 
 # Initialize Celery
 celery_app = Celery(
@@ -24,20 +24,27 @@ celery_app.conf.update(
 # Periodic task schedule
 celery_app.conf.beat_schedule = {
     'scan-trends-hourly': {
-        'task': 'backend.tasks.trend_tasks.scan_trends_task',
+        'task': 'tasks.trend_tasks.scan_trends_task',
         'schedule': crontab(minute=0),  # Every hour
     },
     'analyze-pending-products': {
-        'task': 'backend.tasks.analysis_tasks.analyze_pending_products_task',
+        'task': 'tasks.analysis_tasks.analyze_pending_products_task',
         'schedule': crontab(minute='*/15'),  # Every 15 minutes
     },
     'sync-platform-listings': {
-        'task': 'backend.tasks.platform_tasks.sync_listings_task',
+        'task': 'tasks.platform_tasks.sync_listings_task',
         'schedule': crontab(minute='*/30'),  # Every 30 minutes
+    },
+    'autonomous-health-check': {
+        'task': 'tasks.monitoring_tasks.autonomous_health_check',
+        'schedule': crontab(minute='*/5'),  # Every 5 minutes - Autonomous monitoring
     },
 }
 
 # Auto-discover tasks
 celery_app.autodiscover_tasks([
-    'backend.tasks'
+    'tasks'
 ])
+
+# Explicitly import tasks to ensure they're registered
+from tasks import trend_tasks, analysis_tasks, platform_tasks, monitoring_tasks
