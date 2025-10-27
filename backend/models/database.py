@@ -1,18 +1,31 @@
 """
-Database models and schema
+Database models and schema with optimized connection pooling and indexes
 """
-from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, JSON, Text, Enum
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, JSON, Text, Enum, Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
 from datetime import datetime
 import enum
+import logging
 
 from config.settings import settings
 
+logger = logging.getLogger(__name__)
+
 Base = declarative_base()
 
-# Create database engine
-engine = create_engine(settings.DATABASE_URL)
+# Create database engine with connection pooling
+engine = create_engine(
+    settings.DATABASE_URL,
+    poolclass=QueuePool,
+    pool_size=settings.DB_POOL_SIZE,
+    max_overflow=settings.DB_MAX_OVERFLOW,
+    pool_timeout=settings.DB_POOL_TIMEOUT,
+    pool_recycle=settings.DB_POOL_RECYCLE,
+    pool_pre_ping=True,  # Verify connections before using
+    echo=settings.DEBUG,  # Log SQL statements in debug mode
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -45,15 +58,15 @@ class Product(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     # Product Information
-    title = Column(String(500), nullable=False)
+    title = Column(String(500), nullable=False, index=True)
     description = Column(Text)
-    category = Column(String(200))
+    category = Column(String(200), index=True)
     image_url = Column(String(1000))
     source_url = Column(String(1000))
 
     # Trend Analysis
-    trend_score = Column(Float, default=0.0)
-    trend_source = Column(String(200))  # Where we found it trending
+    trend_score = Column(Float, default=0.0, index=True)
+    trend_source = Column(String(200), index=True)  # Where we found it trending
     search_volume = Column(Integer)
     social_mentions = Column(Integer)
 
@@ -70,8 +83,13 @@ class Product(Base):
     potential_margin = Column(Float)
 
     # Status & Workflow
-    status = Column(Enum(ProductStatus, values_callable=lambda x: [e.value for e in x]), default=ProductStatus.DISCOVERED)
-    approved_by_user = Column(Boolean, default=False)
+    status = Column(
+        Enum(ProductStatus, values_callable=lambda x: [e.value for e in x]),
+        default=ProductStatus.DISCOVERED,
+        nullable=False,
+        index=True
+    )
+    approved_by_user = Column(Boolean, default=False, index=True)
     rejection_reason = Column(Text)
 
     # Platform Posting Status
@@ -79,14 +97,21 @@ class Product(Base):
     platform_ids = Column(JSON)  # Dict of platform: listing_id
 
     # Metadata
-    discovered_at = Column(DateTime, default=datetime.utcnow)
+    discovered_at = Column(DateTime, default=datetime.utcnow, index=True)
     analyzed_at = Column(DateTime)
     approved_at = Column(DateTime)
     rejected_at = Column(DateTime)  # Track when product was rejected (for learning)
     posted_at = Column(DateTime)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    scan_id = Column(String(50))  # Track which scan found this product
+    scan_id = Column(String(50), index=True)  # Track which scan found this product
     is_new = Column(Boolean, default=True)  # Mark as new for current scan
+
+    # Composite indexes for common query patterns
+    __table_args__ = (
+        Index('idx_status_discovered_at', 'status', 'discovered_at'),
+        Index('idx_status_trend_score', 'status', 'trend_score'),
+        Index('idx_trend_source_status', 'trend_source', 'status'),
+    )
 
 
 class TrendSource(Base):
@@ -94,15 +119,15 @@ class TrendSource(Base):
     __tablename__ = "trend_sources"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(200), unique=True, nullable=False)
-    source_type = Column(String(100))  # google_trends, social_media, marketplace
+    name = Column(String(200), unique=True, nullable=False, index=True)
+    source_type = Column(String(100), index=True)  # google_trends, social_media, marketplace
     url = Column(String(1000))
-    enabled = Column(Boolean, default=True)
+    enabled = Column(Boolean, default=True, index=True)
 
     # Performance Metrics
     products_found = Column(Integer, default=0)
     successful_posts = Column(Integer, default=0)
-    last_scan = Column(DateTime)
+    last_scan = Column(DateTime, index=True)
 
     # Configuration
     scan_interval_minutes = Column(Integer, default=60)
@@ -117,13 +142,17 @@ class PlatformListing(Base):
     __tablename__ = "platform_listings"
 
     id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer, nullable=False)
-    platform = Column(Enum(Platform, values_callable=lambda x: [e.value for e in x]), nullable=False)
+    product_id = Column(Integer, nullable=False, index=True)
+    platform = Column(
+        Enum(Platform, values_callable=lambda x: [e.value for e in x]),
+        nullable=False,
+        index=True
+    )
 
     # Platform-specific data
     platform_listing_id = Column(String(200))
     listing_url = Column(String(1000))
-    listing_status = Column(String(100))  # active, sold, removed, error
+    listing_status = Column(String(100), index=True)  # active, sold, removed, error
 
     # Performance
     views = Column(Integer, default=0)
@@ -132,9 +161,13 @@ class PlatformListing(Base):
     revenue = Column(Float, default=0.0)
 
     # Metadata
-    posted_at = Column(DateTime, default=datetime.utcnow)
+    posted_at = Column(DateTime, default=datetime.utcnow, index=True)
     last_synced = Column(DateTime)
     error_message = Column(Text)
+
+    __table_args__ = (
+        Index('idx_product_platform', 'product_id', 'platform'),
+    )
 
 
 class AuditLog(Base):
@@ -142,38 +175,43 @@ class AuditLog(Base):
     __tablename__ = "audit_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    action = Column(String(200), nullable=False)
-    entity_type = Column(String(100))  # product, listing, trend_source
+    action = Column(String(200), nullable=False, index=True)
+    entity_type = Column(String(100), index=True)  # product, listing, trend_source
     entity_id = Column(Integer)
 
     details = Column(JSON)
     user_id = Column(String(200))  # For future multi-user support
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
 
 def get_db():
-    """Database session dependency"""
+    """Database session dependency with automatic cleanup"""
     db = SessionLocal()
     try:
         yield db
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()
 
 
 def init_db():
-    """Initialize database tables"""
-    print("\n" + "="*60)
-    print("🔧 INITIALIZING DATABASE")
-    print("="*60)
+    """Initialize database tables with proper logging"""
+    logger.info("="*60)
+    logger.info("Initializing database")
+    logger.info("="*60)
 
     try:
-        print(f"Database URL: {settings.DATABASE_URL}")
-        print("Creating tables...")
+        # Mask sensitive parts of database URL for logging
+        db_url_safe = settings.DATABASE_URL.split('@')[1] if '@' in settings.DATABASE_URL else 'configured'
+        logger.info(f"Database URL: {db_url_safe}")
+        logger.info("Creating tables...")
 
         # Test connection first
         with engine.connect() as conn:
-            print("✓ Database connection successful!")
+            logger.info("Database connection successful")
 
         # Create all tables
         Base.metadata.create_all(bind=engine)
@@ -183,13 +221,11 @@ def init_db():
         inspector = inspect(engine)
         tables = inspector.get_table_names()
 
-        print(f"✓ Tables created: {', '.join(tables)}")
-        print("="*60 + "\n")
+        logger.info(f"Tables created: {', '.join(tables)}")
+        logger.info("="*60)
 
         return True
 
     except Exception as e:
-        print(f"✗ Database initialization failed!")
-        print(f"  Error: {str(e)}")
-        print("="*60 + "\n")
+        logger.error(f"Database initialization failed: {str(e)}", exc_info=True)
         raise
