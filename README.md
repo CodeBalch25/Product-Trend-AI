@@ -15,7 +15,7 @@ Your application now **monitors and fixes itself automatically**:
 - 🔄 **Auto-rollback** if fixes fail
 - 📊 **Health monitoring API** at `/api/monitoring/health`
 
-**See [CURRENT_STATUS.md](CURRENT_STATUS.md) for complete system status and recent bug fixes.**
+**See [CURRENT_STATUS.md](docs/CURRENT_STATUS.md) for complete system status and recent bug fixes.**
 
 ---
 
@@ -196,6 +196,53 @@ This application is designed as a **semi-automated** system that requires human 
 - `GET /api/monitoring/backups` - List backups
 - `POST /api/monitoring/rollback/{id}` - Rollback
 - `GET /api/monitoring/stats` - Fix statistics
+
+---
+
+## 📁 Project Structure
+
+```
+Product-Trend-AI/
+├── backend/               # FastAPI backend application
+│   ├── agents/           # AI agent implementations
+│   │   └── devops/       # DevOps autonomous agents
+│   ├── api/              # API routes and endpoints
+│   ├── config/           # Configuration files
+│   ├── models/           # Database models (SQLAlchemy)
+│   ├── monitoring/       # Health monitoring & metrics
+│   ├── routes/           # API route handlers
+│   ├── safety/           # Safety & validation logic
+│   ├── scripts/          # Backend utility scripts
+│   │   ├── clear_database.py
+│   │   ├── clear_products.py
+│   │   └── manage_products.py
+│   ├── services/         # Business logic services
+│   │   ├── ai_analysis/  # 11-agent AI system
+│   │   ├── ml/           # Machine learning models
+│   │   ├── platform_integrations/  # Platform API clients
+│   │   └── trend_discovery/        # Trend scanning
+│   └── tasks/            # Celery background tasks
+├── frontend/             # Next.js frontend application
+│   └── src/
+│       ├── components/   # React components
+│       ├── pages/        # Next.js pages
+│       ├── services/     # API client services
+│       └── styles/       # CSS/Tailwind styles
+├── docs/                 # Documentation files
+│   ├── CURRENT_STATUS.md
+│   ├── AUTONOMOUS_SYSTEM.md
+│   ├── AGENT_ROLES_STRUCTURE.md
+│   └── ... (all other .md files)
+├── scripts/              # Utility scripts (.bat files)
+│   ├── START_APP.bat
+│   ├── start.bat
+│   └── ... (other scripts)
+├── tests/                # Test files
+│   └── test_qwen_integration.py
+├── .env.example          # Environment variables template
+├── docker-compose.yml    # Docker services configuration
+└── README.md             # This file
+```
 
 ---
 

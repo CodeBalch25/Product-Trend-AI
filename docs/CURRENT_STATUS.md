@@ -212,7 +212,7 @@ docker-compose logs celery-beat | findstr "autonomous-health-check"
 
 **Files Modified:**
 - `backend/services/ai_analysis/agentic_system.py` (lines 35-42, 283-941)
-- Test script created: `test_qwen_integration.py`
+- Test script created: `tests/test_qwen_integration.py`
 
 **Benefits:**
 - Superior trend prediction with statistical reasoning
