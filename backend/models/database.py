@@ -112,6 +112,36 @@ class TrendSource(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+class TrendingKeyword(Base):
+    """
+    Stores trending keywords discovered by Perplexity
+    Creates feedback loop: Perplexity discovers → Store → Trend scanner uses
+    """
+    __tablename__ = "trending_keywords"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Keyword Information
+    keyword = Column(String(200), unique=True, nullable=False, index=True)
+    category = Column(String(200))
+    trend_strength = Column(String(50))  # explosive, strong, emerging, fading
+
+    # Usage Tracking
+    search_count = Column(Integer, default=1)  # How many times discovered
+    last_seen = Column(DateTime, default=datetime.utcnow)  # Last time seen trending
+    first_discovered = Column(DateTime, default=datetime.utcnow)
+
+    # Related Data
+    related_products = Column(JSON)  # List of products using this keyword
+    source_urls = Column(JSON)  # Where this trend was discovered
+
+    # Expiry (keywords become stale)
+    expires_at = Column(DateTime)  # When to stop using this keyword
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 class PlatformListing(Base):
     """Track posted listings across platforms"""
     __tablename__ = "platform_listings"

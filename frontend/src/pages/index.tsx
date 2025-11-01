@@ -56,12 +56,14 @@ export default function Home() {
         <meta name="description" content="AI-powered product trend discovery" />
       </Head>
 
-      <div className="space-y-8">
+      <div className="space-y-10">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-5xl font-bold text-gradient from-violet-600 to-indigo-600 mb-3">
+              Dashboard
+            </h1>
+            <p className="text-slate-600 text-lg font-medium">
               AI-powered product trend discovery and listing automation
             </p>
           </div>
@@ -70,7 +72,17 @@ export default function Home() {
             disabled={isScanning}
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isScanning ? 'Scanning...' : 'Scan Trends Now'}
+            {isScanning ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Scanning...
+              </span>
+            ) : (
+              'Scan Trends Now'
+            )}
           </button>
         </div>
 
@@ -79,53 +91,54 @@ export default function Home() {
 
         {/* Filters */}
         <div className="card">
-          <div className="flex gap-2">
+          <h3 className="text-lg font-bold text-slate-800 mb-4">Filter Products</h3>
+          <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setStatusFilter('all')}
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 statusFilter === 'all'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
+                  ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/50 scale-105'
+                  : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-violet-300 hover:bg-violet-50'
               }`}
             >
               All Products
             </button>
             <button
               onClick={() => setStatusFilter('pending_review')}
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 statusFilter === 'pending_review'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/50 scale-105'
+                  : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-amber-300 hover:bg-amber-50'
               }`}
             >
               Pending Review
             </button>
             <button
               onClick={() => setStatusFilter('approved')}
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 statusFilter === 'approved'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/50 scale-105'
+                  : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50'
               }`}
             >
               Approved
             </button>
             <button
               onClick={() => setStatusFilter('posted')}
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 statusFilter === 'posted'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
+                  ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/50 scale-105'
+                  : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-blue-50'
               }`}
             >
               Posted
             </button>
             <button
               onClick={() => setStatusFilter('rejected')}
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-200 ${
                 statusFilter === 'rejected'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
+                  ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-500/50 scale-105'
+                  : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-rose-300 hover:bg-rose-50'
               }`}
             >
               Rejected
@@ -136,24 +149,31 @@ export default function Home() {
         {/* Products Grid */}
         <div>
           {error && (
-            <div className="card bg-red-50 border border-red-200">
-              <p className="text-red-800">Failed to load products</p>
+            <div className="card bg-gradient-to-r from-rose-50 to-red-50 border-2 border-rose-300">
+              <p className="text-rose-800 font-semibold text-center">Failed to load products</p>
             </div>
           )}
 
           {!products && !error && (
-            <div className="card">
-              <p className="text-gray-500">Loading products...</p>
+            <div className="card text-center">
+              <div className="flex items-center justify-center gap-3">
+                <svg className="animate-spin h-6 w-6 text-violet-600" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                <p className="text-slate-600 font-medium">Loading products...</p>
+              </div>
             </div>
           )}
 
           {filteredProducts && filteredProducts.length === 0 && (
-            <div className="card">
-              <p className="text-gray-500">No products found</p>
+            <div className="card text-center">
+              <p className="text-slate-500 font-medium">No products found</p>
+              <p className="text-slate-400 text-sm mt-2">Try scanning for trends or adjusting your filter</p>
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
             {filteredProducts?.map((product: any) => (
               <ProductCard
                 key={product.id}

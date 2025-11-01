@@ -12,17 +12,17 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Total Products */}
-      <div className="card">
+      <div className="gradient-card from-blue-500 to-cyan-500 group">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">Total Products</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">
+            <p className="text-sm font-medium text-white/90">Total Products</p>
+            <p className="text-4xl font-bold text-white mt-2">
               {stats.total_products}
             </p>
           </div>
-          <div className="bg-blue-100 p-3 rounded-full">
+          <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300">
             <svg
-              className="w-6 h-6 text-blue-600"
+              className="w-8 h-8 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -36,20 +36,21 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
             </svg>
           </div>
         </div>
+        <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
       {/* Pending Review */}
-      <div className="card">
+      <div className="gradient-card from-amber-500 to-orange-500 group">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">Pending Review</p>
-            <p className="text-3xl font-bold text-yellow-600 mt-1">
+            <p className="text-sm font-medium text-white/90">Pending Review</p>
+            <p className="text-4xl font-bold text-white mt-2">
               {stats.pending_review}
             </p>
           </div>
-          <div className="bg-yellow-100 p-3 rounded-full">
+          <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300">
             <svg
-              className="w-6 h-6 text-yellow-600"
+              className="w-8 h-8 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -63,20 +64,21 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
             </svg>
           </div>
         </div>
+        <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
       {/* Approved */}
-      <div className="card">
+      <div className="gradient-card from-emerald-500 to-teal-500 group">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">Approved</p>
-            <p className="text-3xl font-bold text-green-600 mt-1">
+            <p className="text-sm font-medium text-white/90">Approved</p>
+            <p className="text-4xl font-bold text-white mt-2">
               {stats.approved}
             </p>
           </div>
-          <div className="bg-green-100 p-3 rounded-full">
+          <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300">
             <svg
-              className="w-6 h-6 text-green-600"
+              className="w-8 h-8 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -90,20 +92,21 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
             </svg>
           </div>
         </div>
+        <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
       {/* Posted */}
-      <div className="card">
+      <div className="gradient-card from-violet-600 to-indigo-600 group">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">Posted</p>
-            <p className="text-3xl font-bold text-primary-600 mt-1">
+            <p className="text-sm font-medium text-white/90">Posted</p>
+            <p className="text-4xl font-bold text-white mt-2">
               {stats.posted}
             </p>
           </div>
-          <div className="bg-primary-100 p-3 rounded-full">
+          <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl group-hover:scale-110 transition-transform duration-300">
             <svg
-              className="w-6 h-6 text-primary-600"
+              className="w-8 h-8 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -117,22 +120,29 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
             </svg>
           </div>
         </div>
+        <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
       {/* Platform Stats */}
       {Object.keys(stats.platform_stats).length > 0 && (
         <div className="card col-span-full">
-          <h3 className="text-lg font-semibold mb-4">Platform Performance</h3>
+          <h3 className="text-xl font-bold text-slate-800 mb-6 text-gradient from-violet-600 to-indigo-600">
+            Platform Performance
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {Object.entries(stats.platform_stats).map(([platform, data]) => (
-              <div key={platform} className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-500 capitalize">
+              <div
+                key={platform}
+                className="relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 p-5 rounded-2xl border border-slate-200/60 hover:shadow-lg hover:scale-105 transition-all duration-300 group"
+              >
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+                <p className="text-sm text-slate-600 capitalize font-medium relative">
                   {platform.replace('_', ' ')}
                 </p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-3xl font-bold text-slate-900 mt-2 relative">
                   {data.count}
                 </p>
-                <p className="text-sm text-green-600 mt-1">
+                <p className="text-sm font-semibold text-emerald-600 mt-2 relative">
                   ${data.revenue.toFixed(2)}
                 </p>
               </div>

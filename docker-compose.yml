@@ -39,6 +39,7 @@ services:
       - .env
     volumes:
       - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock  # Allow docker command execution
     depends_on:
       - postgres
       - redis
@@ -59,6 +60,7 @@ services:
       - .env
     volumes:
       - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock  # Allow docker command execution
     depends_on:
       - postgres
       - redis

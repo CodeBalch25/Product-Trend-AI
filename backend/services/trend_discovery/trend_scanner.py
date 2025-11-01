@@ -9,7 +9,7 @@ import json
 import random
 import time
 
-from models.database import Product, TrendSource, ProductStatus
+from models.database import Product, TrendSource, ProductStatus, TrendingKeyword
 from config.settings import settings
 from services.ai_analysis.adaptive_scoring import AdaptiveScoring
 
@@ -31,6 +31,7 @@ class TrendScanner:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
         self.adaptive_scorer = None
+        self.discovered_keywords = []  # Keywords from Perplexity discovery
 
     async def scan_all_sources(self, db) -> Dict[str, Any]:
         """Scan all enabled trend sources"""
@@ -57,6 +58,9 @@ class TrendScanner:
         else:
             print(f"\n📊 No threshold adjustments needed (using current thresholds)")
             print(f"   • Min trend score: {self.adaptive_scorer.thresholds['min_trend_score']}")
+
+        # Load discovered keywords from Perplexity (feedback loop)
+        self._load_discovered_keywords(db)
 
         print()
 
@@ -917,3 +921,48 @@ class TrendScanner:
         print(f"✓ Pinterest trends loaded - {len(products)} wellness products")
 
         return products[:8]
+
+    def _load_discovered_keywords(self, db) -> None:
+        """
+        Load trending keywords discovered by Perplexity (feedback loop)
+        These keywords will be used to enrich searches across all sources
+        """
+        try:
+            from datetime import datetime
+
+            # Get active trending keywords (not expired)
+            trending = db.query(TrendingKeyword).filter(
+                TrendingKeyword.expires_at > datetime.utcnow()
+            ).order_by(
+                TrendingKeyword.search_count.desc()
+            ).limit(20).all()
+
+            if trending:
+                self.discovered_keywords = [kw.keyword for kw in trending]
+                print(f"\n🔄 [FEEDBACK LOOP] Loaded {len(self.discovered_keywords)} trending keywords from Perplexity:")
+                for i, keyword in enumerate(self.discovered_keywords[:10], 1):
+                    print(f"   {i}. {keyword}")
+                if len(self.discovered_keywords) > 10:
+                    print(f"   ... and {len(self.discovered_keywords) - 10} more")
+                print(f"   💡 Scanner will prioritize products matching these keywords")
+            else:
+                print(f"\n📝 No trending keywords discovered yet (Perplexity discovery runs every 6 hours)")
+
+        except Exception as e:
+            # Don't fail if table doesn't exist yet
+            if "no such table" in str(e).lower() or "relation" in str(e).lower():
+                print(f"\n📝 TrendingKeyword table not created yet - run database initialization")
+            else:
+                print(f"\n⚠️ Could not load discovered keywords: {str(e)[:100]}")
+            self.discovered_keywords = []
+
+    def has_trending_keywords(self, product_title: str, product_description: str = "") -> bool:
+        """
+        Check if a product matches any discovered trending keywords
+        Used to boost products that match Perplexity discoveries
+        """
+        if not self.discovered_keywords:
+            return False
+
+        text = (product_title + " " + product_description).lower()
+        return any(keyword.lower() in text for keyword in self.discovered_keywords)

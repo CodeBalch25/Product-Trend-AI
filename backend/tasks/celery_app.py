@@ -39,6 +39,10 @@ celery_app.conf.beat_schedule = {
         'task': 'tasks.monitoring_tasks.autonomous_health_check',
         'schedule': crontab(minute='*/5'),  # Every 5 minutes - Autonomous monitoring
     },
+    'perplexity-discovery': {
+        'task': 'tasks.trend_tasks.perplexity_discovery_task',
+        'schedule': crontab(minute=0, hour='*/6'),  # Every 6 hours - Web trend discovery
+    },
 }
 
 # Auto-discover tasks

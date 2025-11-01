@@ -12,18 +12,69 @@ from collections import Counter
 class LogParser:
     """Parse logs from various sources"""
 
-    # Error patterns to detect
+    # Error patterns to detect - EXPANDED FOR FULL APPLICATION COVERAGE
     ERROR_PATTERNS = {
+        # Infrastructure & API Errors
         "api_error": r"(429|500|502|503|504) (Client|Server) Error",
-        "python_exception": r"(Traceback|Exception|Error):",
-        "database_error": r"(DatabaseError|OperationalError|IntegrityError)",
-        "connection_error": r"(ConnectionError|TimeoutError|ConnectionRefusedError)",
-        "memory_error": r"(MemoryError|OutOfMemory)",
-        "import_error": r"(ImportError|ModuleNotFoundError)",
-        "syntax_error": r"(SyntaxError|IndentationError)",
+        "database_column_length": r"(value too long for type character varying|StringDataRightTruncation|StringDataTruncation)",
+        "model_deprecation": r"(model.*decommissioned|model.*deprecated|no longer supported)",
         "rate_limit": r"429.*Too Many Requests",
         "groq_error": r"Groq API error",
         "hf_error": r"HuggingFace API error",
+
+        # Database Errors
+        "database_error": r"(psycopg2\..*Error|DatabaseError|OperationalError|IntegrityError)",
+        "database_null_violation": r"(NOT NULL constraint|null value in column)",
+        "database_foreign_key": r"(ForeignKeyViolation|foreign key constraint)",
+        "database_unique_violation": r"(UniqueViolation|duplicate key value)",
+
+        # Python Code Errors
+        "python_exception": r"(Traceback \(most recent call last\)|raise \w+Error|^\w+Error: )",
+        "attribute_error": r"AttributeError.*has no attribute",
+        "key_error": r"KeyError:",
+        "index_error": r"IndexError:",
+        "value_error": r"ValueError:",
+        "type_error": r"TypeError:",
+        "name_error": r"NameError:",
+        "zero_division_error": r"ZeroDivisionError:",
+        "import_error": r"(ImportError|ModuleNotFoundError)",
+        "syntax_error": r"(SyntaxError|IndentationError)",
+
+        # Connection & Network Errors
+        "connection_error": r"(ConnectionError|TimeoutError|ConnectionRefusedError)",
+        "ssl_error": r"SSLError",
+        "dns_error": r"(DNSError|Name or service not known)",
+
+        # Resource Errors
+        "memory_error": r"(MemoryError|OutOfMemory)",
+        "disk_space_error": r"(No space left on device|Disk quota exceeded)",
+        "file_not_found": r"FileNotFoundError",
+
+        # Business Logic Errors
+        "validation_error": r"(ValidationError|Invalid.*format|Failed validation)",
+        "authentication_error": r"(AuthenticationError|Unauthorized|401|Invalid credentials)",
+        "permission_error": r"(PermissionError|Forbidden|403|Access denied)",
+        "not_found_error": r"(NotFound|404|does not exist)",
+
+        # Performance Issues
+        "slow_query": r"(slow query|query.*exceeded|timeout.*query)",
+        "high_cpu": r"(CPU.*high|CPU usage.*%)",
+        "high_memory": r"(Memory.*high|Memory usage.*%)",
+
+        # Frontend Errors (from logs/API)
+        "frontend_error": r"(React.*Error|Uncaught.*error|Frontend error)",
+        "cors_error": r"(CORS|Cross-Origin|blocked by CORS)",
+
+        # Platform API Errors
+        "amazon_api_error": r"(Amazon.*error|SP-API.*error)",
+        "ebay_api_error": r"(eBay.*error|eBay API)",
+        "tiktok_api_error": r"(TikTok.*error|TikTok API)",
+
+        # Data Quality Issues
+        "data_corruption": r"(corrupted data|invalid data|malformed)",
+        "missing_required_field": r"(missing required|field.*required)",
+        "invalid_json_field": r"(is not a function|\.map is not a function|JSON field.*string)",
+        "null_string_in_json": r"(ai_keywords.*null|string 'null'|\"null\" instead of null)",
     }
 
     def __init__(self):
@@ -76,7 +127,7 @@ class LogParser:
 
     def _determine_severity(self, error_type: str) -> str:
         """Determine error severity"""
-        critical_errors = ["database_error", "memory_error", "500"]
+        critical_errors = ["database_error", "database_column_length", "model_deprecation", "memory_error", "500"]
         warning_errors = ["rate_limit", "429", "connection_error"]
 
         if error_type in critical_errors:

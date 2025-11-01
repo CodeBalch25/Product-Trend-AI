@@ -77,7 +77,8 @@ class AutonomousCoordinator:
             confidence = root_cause.get("confidence", 0)
 
             # Decide whether to auto-fix based on confidence
-            if confidence >= 85:  # High confidence threshold
+            # 🔧 AGGRESSIVE AUTO-FIX MODE: Lowered from 85% to 70% for full application coverage
+            if confidence >= 70:  # More aggressive auto-fix threshold
                 print(f"\n🎯 High confidence ({confidence}%) - Generating fix...")
 
                 # Generate fix
@@ -91,6 +92,9 @@ class AutonomousCoordinator:
 
                     if apply_result["status"] == "success":
                         print(f"✅ Fix applied successfully!")
+
+                        # Log the fix details
+                        self._log_fix_details(root_cause, fix, apply_result)
 
                         # Monitor for 2 minutes
                         validation = self._validate_fix(fix, apply_result)
@@ -201,6 +205,58 @@ class AutonomousCoordinator:
         print(f"   📊 Monitoring: {monitoring}")
         print(f"\n   ⏱️  Total Duration: {duration:.1f} seconds")
         print(f"\n{'*'*80}\n")
+
+    def _log_fix_details(self, root_cause: Dict, fix: Dict, apply_result: Dict):
+        """Log detailed information about applied fix"""
+        try:
+            log_file = "/app/logs/autonomous_fixes.log"
+            with open(log_file, "a") as f:
+                timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+                f.write(f"\n{'*'*80}\n")
+                f.write(f"🔧 AUTONOMOUS FIX APPLIED - {timestamp}\n")
+                f.write(f"{'*'*80}\n\n")
+
+                # Root Cause
+                f.write(f"📋 ISSUE DETECTED:\n")
+                f.write(f"   Type: {root_cause.get('issue_type', 'Unknown')}\n")
+                f.write(f"   Severity: {root_cause.get('severity', 'Unknown').upper()}\n")
+                f.write(f"   Confidence: {root_cause.get('confidence', 0)}%\n")
+                f.write(f"   Description: {root_cause.get('description', 'N/A')}\n\n")
+
+                # Fix Details
+                f.write(f"🛠️  FIX GENERATED:\n")
+                f.write(f"   Type: {fix.get('fix_type', 'Unknown')}\n")
+                f.write(f"   Confidence: {fix.get('confidence', 0)}%\n")
+                f.write(f"   Risk Level: {fix.get('risk_level', 'Unknown')}\n")
+                f.write(f"   Actions: {len(fix.get('actions', []))}\n\n")
+
+                # Actions Taken
+                f.write(f"⚙️  ACTIONS PERFORMED:\n")
+                for i, action in enumerate(fix.get('actions', []), 1):
+                    f.write(f"   {i}. {action.get('action', 'Unknown')}\n")
+                    if 'change' in action:
+                        f.write(f"      Change: {action['change']}\n")
+
+                    # Show results from apply_result
+                    results = apply_result.get('results', [])
+                    if i <= len(results):
+                        result_status = results[i-1].get('status', 'unknown')
+                        if result_status == 'success':
+                            f.write(f"      ✅ Success\n")
+                        elif result_status == 'failed':
+                            f.write(f"      ❌ Failed\n")
+                        elif result_status == 'skipped':
+                            f.write(f"      ⏭️  Skipped\n")
+                f.write(f"\n")
+
+                # Result
+                f.write(f"✅ FIX APPLIED SUCCESSFULLY\n")
+                f.write(f"   Timestamp: {apply_result.get('timestamp', 'N/A')}\n")
+                if apply_result.get('backups'):
+                    f.write(f"   Backups: {len(apply_result['backups'])} files backed up\n")
+                f.write(f"\n{'*'*80}\n")
+        except Exception as e:
+            print(f"⚠️  Fix logging failed: {str(e)}")
 
     def enable_autonomous_mode(self, auto_apply_threshold: int = 85):
         """Enable autonomous self-healing mode"""

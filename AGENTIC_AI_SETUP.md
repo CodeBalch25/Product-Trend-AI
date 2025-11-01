@@ -1,15 +1,25 @@
 # 🤖 Multi-Agent AI System - Setup Complete!
 
-**Last Updated:** 2025-01-19 | **Version:** 2.0 | **Status:** ✅ QWEN QWQ-32B INTEGRATED
+**Last Updated:** 2025-10-19 | **Version:** 2.1 | **Status:** ✅ QWEN3 32B ACTIVE
 
-## 🧠 NEW: Advanced Reasoning with Qwen QwQ-32B
+## 🧠 UPGRADED: Advanced Reasoning with Qwen3 32B
 
-**Major Update:** The system now uses **Qwen QwQ-32B** for advanced reasoning in critical agents:
+**Latest Update (2025-10-19):** The system now uses **Qwen3 32B** for advanced reasoning in critical agents:
 - 🎯 **Coordinator** (Robert Thompson) - Strategic decisions
-- 📊 **Trend Agent** (Dr. Michael Rodriguez) - Statistical forecasting
-- 💼 **Research Agent** (Jennifer Park) - Financial analysis
+- 📊 **Trend Agent** (Dr. Michael Rodriguez) - Statistical forecasting with deep analysis
+- 💼 **Research Agent** (Jennifer Park) - Financial analysis with CFA-level rigor
 
-**Result:** Superior reasoning capabilities for trend prediction, profit analysis, and final recommendations!
+**Qwen3 32B Advantages:**
+- ✅ Enhanced reasoning capabilities (surpasses QwQ across mathematics, code, logic)
+- ✅ Dual-mode capability (thinking + non-thinking modes)
+- ✅ 131K context window (full capability on Groq)
+- ✅ Superior statistical forecasting with quantitative methods
+- ✅ Detailed competitive analysis with specific metrics
+
+**Technical Details:**
+- Model ID: `qwen/qwen3-32b` (replaces deprecated `qwen-qwq-32b`)
+- Response Time: 3-4 seconds per analysis
+- Cost: 100% FREE on Groq ($0.29/M input tokens if paid tier needed)
 
 ---
 
@@ -61,7 +71,7 @@ Your app uses a **100% FREE & OPEN SOURCE** agentic AI system with 11 specialize
 
 #### **Models Used (All FREE via Groq API):**
 
-1. **🧠 Qwen QwQ-32B** (Groq) ⭐ NEW - Advanced Reasoning Model
+1. **🧠 Qwen3 32B** (Groq) ⭐ UPGRADED - Advanced Reasoning Model
    - Coordinator Agent (Robert Thompson)
    - Trend Agent (Dr. Michael Rodriguez)
    - Research Agent (Jennifer Park)

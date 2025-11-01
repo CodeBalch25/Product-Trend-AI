@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(docker restart:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker-compose restart:*)",
+      "Bash(curl:*)",
+      "Bash(docker ps:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(awk:*)",
+      "Bash(start http://localhost:3000)",
+      "Bash(timeout 60 docker logs:*)",
+      "Bash(timeout 120 docker logs:*)",
+      "Bash(timeout 90 docker logs:*)",
+      "Bash(start http://localhost:8000/docs)",
+      "Bash(timeout 10 docker logs:*)",
+      "Bash(timeout 15 docker logs:*)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "Bash(npm install:*)",
+      "Bash(start http://localhost:3001)",
+      "WebSearch",
+      "Bash(git ls-tree:*)",
+      "Bash(git rm:*)",
+      "Bash(git pull:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

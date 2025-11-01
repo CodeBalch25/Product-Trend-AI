@@ -55,7 +55,11 @@ class RootCauseAnalystAgent:
         """Diagnose specific issue"""
         issue_type = issue.get("type")
 
-        if issue_type == "rate_limiting":
+        if issue_type == "database_column_length":
+            return self._diagnose_database_column_length(issue)
+        elif issue_type == "model_deprecation":
+            return self._diagnose_model_deprecation(issue)
+        elif issue_type == "rate_limiting":
             return self._diagnose_rate_limiting(issue)
         elif issue_type == "database_errors":
             return self._diagnose_database_errors(issue)
@@ -63,8 +67,44 @@ class RootCauseAnalystAgent:
             return self._diagnose_connection_errors(issue)
         elif issue_type == "recurring_pattern":
             return self._diagnose_recurring_pattern(issue)
+        elif issue_type == "data_corruption":
+            return self._diagnose_data_corruption(issue)
         else:
             return self._diagnose_generic(issue)
+
+    def _diagnose_database_column_length(self, issue: Dict) -> Dict:
+        """Diagnose PostgreSQL column length issues"""
+        return {
+            "issue_type": "database_column_length",
+            "root_cause": "Database VARCHAR column size insufficient for AI-generated content",
+            "evidence": [
+                f"{issue.get('count')} products failing with StringDataRightTruncation",
+                "PostgreSQL error: value too long for type character varying(50)",
+                "AI agents generating content exceeding 50 characters"
+            ],
+            "confidence": 98,
+            "fix_category": "database_schema",
+            "affected_component": "PostgreSQL products table",
+            "fix_priority": "critical",
+            "estimated_fix_time_minutes": 2
+        }
+
+    def _diagnose_model_deprecation(self, issue: Dict) -> Dict:
+        """Diagnose AI model deprecation issues"""
+        return {
+            "issue_type": "model_deprecation",
+            "root_cause": "AI model has been decommissioned by provider",
+            "evidence": [
+                f"{issue.get('count')} API calls failing with 404/400 errors",
+                "Model marked as 'decommissioned' or 'deprecated'",
+                "Provider removed model from available endpoints"
+            ],
+            "confidence": 95,
+            "fix_category": "model_upgrade",
+            "affected_component": "agentic_system.py model configuration",
+            "fix_priority": "critical",
+            "estimated_fix_time_minutes": 5
+        }
 
     def _diagnose_rate_limiting(self, issue: Dict) -> Dict:
         """Diagnose rate limiting issues"""
@@ -153,6 +193,23 @@ class RootCauseAnalystAgent:
             "affected_component": "Unknown - requires code inspection",
             "fix_priority": "medium",
             "estimated_fix_time_minutes": 20
+        }
+
+    def _diagnose_data_corruption(self, issue: Dict) -> Dict:
+        """Diagnose data corruption issues (e.g., string 'null' in JSON fields)"""
+        return {
+            "issue_type": "data_corruption",
+            "root_cause": "JSON fields storing string 'null' instead of actual NULL values",
+            "evidence": [
+                f"{issue.get('count')} frontend errors from corrupted JSON fields",
+                "Frontend trying to call .map() on string instead of array",
+                "Backend storing string 'null' instead of NULL in database"
+            ],
+            "confidence": 85,
+            "fix_category": "data_cleanup",
+            "affected_component": "Database products table (ai_keywords, ai_description, ai_category)",
+            "fix_priority": "high",
+            "estimated_fix_time_minutes": 10
         }
 
     def _diagnose_generic(self, issue: Dict) -> Dict:
