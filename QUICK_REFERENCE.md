@@ -1,8 +1,8 @@
-# 🚀 SELF-HEALING SYSTEM - QUICK REFERENCE CARD
+# SELF-HEALING SYSTEM - QUICK REFERENCE CARD
 
 ---
 
-## ⚡ MOST USED COMMANDS
+## MOST USED COMMANDS
 
 ### Watch Live Auto-Fixes
 ```bash
@@ -26,18 +26,18 @@ docker exec product-trend-celery python -c "from tasks.monitoring_tasks import a
 
 ---
 
-## 📊 SYSTEM INFO
+## SYSTEM INFO
 
-- **Runs:** Every 5 minutes (24/7)
-- **Auto-Fix Threshold:** 70% confidence
+- **Runs:** Every 15 minutes (24/7)
+- **Auto-Fix Threshold:** 85% confidence
 - **Error Types Detected:** 42+
 - **Auto-Fix Capabilities:** 15+ error types
 - **Validation Period:** 2 minutes per fix
-- **Coverage:** Full application (infrastructure → frontend)
+- **Coverage:** Full application (infrastructure to frontend)
 
 ---
 
-## 📁 LOG LOCATIONS
+## LOG LOCATIONS
 
 | Type | Location | Use For |
 |------|----------|---------|
@@ -47,23 +47,23 @@ docker exec product-trend-celery python -c "from tasks.monitoring_tasks import a
 
 ---
 
-## 🔧 CAPABILITIES
+## CAPABILITIES
 
-### ✅ Auto-Fixes (70-98% confidence)
+### Auto-Fixes (85-98% confidence)
 - Database column expansion
-- NULL violations → defaults
-- Duplicate keys → upsert
-- KeyError → dict.get()
-- AttributeError → getattr()
-- ImportError → pip install
-- CORS errors → middleware update
-- Validation errors → schema update
-- Missing files → create
-- Slow queries → add indexes
+- NULL violations to defaults
+- Duplicate keys to upsert
+- KeyError to dict.get()
+- AttributeError to getattr()
+- ImportError to pip install
+- CORS errors to middleware update
+- Validation errors to schema update
+- Missing files to create
+- Slow queries to add indexes
 
 ---
 
-## 🎯 WHEN TO CHECK LOGS
+## WHEN TO CHECK LOGS
 
 | Scenario | Command |
 |----------|---------|
@@ -74,49 +74,49 @@ docker exec product-trend-celery python -c "from tasks.monitoring_tasks import a
 
 ---
 
-## 🔍 QUICK TROUBLESHOOTING
+## QUICK TROUBLESHOOTING
 
 | Problem | Solution |
 |---------|----------|
 | No logs appearing | Create directory: `docker exec product-trend-backend mkdir -p /app/logs` |
 | Checks not running | Restart: `docker restart product-trend-celery-beat` |
-| Fixes not applying | Check threshold: Should be 70% in `autonomous_coordinator.py:81` |
+| Fixes not applying | Check threshold: Should be 85% in `autonomous_coordinator.py` |
 
 ---
 
-## 📈 PERFORMANCE METRICS
+## PERFORMANCE METRICS
 
 **Before Expansion:**
 - Auto-fixed: 5 error types
 - Response time: 30-120 min
 - Uptime: ~95%
 
-**After Expansion (Now):**
+**After Expansion (Current):**
 - Auto-fixed: 20+ error types (4x more!)
 - Response time: 3-15 min (10x faster!)
 - Uptime: 99%+
 
 ---
 
-## 🎉 REAL EXAMPLE
+## REAL EXAMPLE
 
-**Actual auto-fix from your system:**
+**Actual auto-fix from the system:**
 ```
 2025-10-21 06:05:03 UTC
 Issue: Database column "ai_category" too short
 Fix: ALTER TABLE products ALTER COLUMN ai_category TYPE VARCHAR(500)
 Confidence: 98%
-Result: ✅ SUCCESS
+Result: [SUCCESS]
 Duration: ~3 seconds
 ```
 
 ---
 
-## 📚 FULL DOCUMENTATION
+## FULL DOCUMENTATION
 
-1. **SELF_HEALING_EXPANSION.md** - Complete system capabilities
-2. **DEMONSTRATION_RESULTS.md** - Live demo with examples
-3. **LOG_MONITORING_GUIDE.md** - Detailed monitoring guide
+1. **MONITOR_AUTONOMOUS_AGENTS.md** - Complete monitoring guide
+2. **PROJECT_STATE.md** - System state and capabilities
+3. **RESTART_GUIDE.md** - Service management
 4. **QUICK_REFERENCE.md** - This card!
 
 ---
@@ -124,4 +124,4 @@ Duration: ~3 seconds
 **Keep this card handy for quick access to monitoring commands!**
 
 **System Version:** v2.0 - Full Application Coverage
-**Last Updated:** October 21, 2025
+**Last Updated:** November 1, 2025

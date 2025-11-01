@@ -1,4 +1,4 @@
-# 🚀 QUICK RESTART GUIDE
+# QUICK RESTART GUIDE
 
 ## How to Start Your Application
 
@@ -14,12 +14,12 @@ docker ps
 ```
 
 Should see 6 containers running:
-- ✅ product-trend-frontend
-- ✅ product-trend-backend
-- ✅ product-trend-celery
-- ✅ product-trend-celery-beat
-- ✅ product-trend-db
-- ✅ product-trend-redis
+- [RUNNING] product-trend-frontend
+- [RUNNING] product-trend-backend
+- [RUNNING] product-trend-celery
+- [RUNNING] product-trend-celery-beat
+- [RUNNING] product-trend-db
+- [RUNNING] product-trend-redis
 
 ### 3. Access Your Application:
 - **Frontend:** http://localhost:3000
@@ -89,4 +89,4 @@ docker-compose restart backend celery
 
 ---
 
-**That's it! Your self-healing system will monitor and fix issues automatically every 5 minutes.** 🎉
+**That's it! Your self-healing system will monitor and fix issues automatically every 15 minutes.**

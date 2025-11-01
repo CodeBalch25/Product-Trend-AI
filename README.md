@@ -1,25 +1,25 @@
 # Product Trend Automation System
 
-**Version:** 1.0.0 | **Status:** ✅ PRODUCTION READY | **Last Updated:** 2025-10-19
+**Version:** 1.0.0 | **Status:** PRODUCTION READY | **Last Updated:** 2025-11-01
 
 AI-powered product trend discovery and multi-platform listing management system with **autonomous self-healing** and manual approval workflows.
 
-## 🎉 NEW: Autonomous Self-Healing System
+## NEW: Autonomous Self-Healing System
 
 Your application now **monitors and fixes itself automatically**:
 
-- 🤖 **7 AI DevOps Agents** working 24/7
-- ⏰ **Checks every 5 minutes** for issues
-- 🔧 **Auto-fixes with 85%+ confidence**
-- 💾 **Automatic backups** before changes
-- 🔄 **Auto-rollback** if fixes fail
-- 📊 **Health monitoring API** at `/api/monitoring/health`
+- **12 AI Agents** (11 Groq + 1 Perplexity) working 24/7
+- **Checks every 15 minutes** for issues
+- **Auto-fixes with 85%+ confidence**
+- **Automatic backups** before changes
+- **Auto-rollback** if fixes fail
+- **Health monitoring API** at `/api/monitoring/health`
 
-**See [CURRENT_STATUS.md](CURRENT_STATUS.md) for complete system status and recent bug fixes.**
+**See [START_HERE.md](START_HERE.md) or [PROJECT_STATE.md](PROJECT_STATE.md) for complete system status.**
 
 ---
 
-## ⚠️ IMPORTANT LEGAL & COMPLIANCE NOTICES
+## IMPORTANT LEGAL & COMPLIANCE NOTICES
 
 ### Platform Terms of Service Compliance
 
@@ -58,25 +58,25 @@ This application is designed as a **semi-automated** system that requires human 
    - Product liability considerations
 
 ### This System DOES NOT:
-- ❌ Automatically post without human review (manual approval required)
-- ❌ Guarantee compliance with platform policies
-- ❌ Replace need for proper business setup and licensing
-- ❌ Handle order fulfillment, customer service, or returns
-- ❌ Provide legal or business advice
+- [X] Automatically post without human review (manual approval required)
+- [X] Guarantee compliance with platform policies
+- [X] Replace need for proper business setup and licensing
+- [X] Handle order fulfillment, customer service, or returns
+- [X] Provide legal or business advice
 
 ### This System DOES:
-- ✅ Discover trending products from multiple sources
-- ✅ Use AI to analyze and categorize products
-- ✅ Provide a dashboard for reviewing products
-- ✅ Require manual approval before posting
-- ✅ Support multi-platform posting through official APIs
-- ✅ Track product performance across platforms
-- ✅ **Monitor and self-heal system issues autonomously**
-- ✅ **Auto-fix errors with AI-powered DevOps agents**
+- [YES] Discover trending products from multiple sources
+- [YES] Use AI to analyze and categorize products
+- [YES] Provide a dashboard for reviewing products
+- [YES] Require manual approval before posting
+- [YES] Support multi-platform posting through official APIs
+- [YES] Track product performance across platforms
+- [YES] **Monitor and self-heal system issues autonomously**
+- [YES] **Auto-fix errors with AI-powered DevOps agents**
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Tech Stack
 
@@ -85,7 +85,7 @@ This application is designed as a **semi-automated** system that requires human 
 - PostgreSQL (database)
 - SQLAlchemy (ORM)
 - Celery + Redis (task queue)
-- OpenAI/Anthropic/Groq APIs (AI analysis)
+- Groq/Perplexity APIs (AI analysis - 100% FREE TIER)
 - psutil (System monitoring for autonomous agents)
 
 **Frontend:**
@@ -102,22 +102,22 @@ This application is designed as a **semi-automated** system that requires human 
 
 ```
 ┌─────────────────┐
-│  Trend Sources  │ (Google Trends, Reddit, TikTok, etc.)
+│  Trend Sources  │ (Google Trends, Reddit, TikTok, Perplexity Web Search)
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│ Trend Scanner   │ (Celery periodic task)
+│ Trend Scanner   │ (Celery periodic task - every 1 hour)
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│   PostgreSQL    │ (Store discovered products)
+│   PostgreSQL    │ (Store discovered products + trending keywords)
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│  AI Analyzer    │ (Claude/GPT-4 analysis)
+│  AI Analyzer    │ (11 Groq agents + 1 Perplexity agent)
 └────────┬────────┘
          │
          ▼
@@ -131,38 +131,34 @@ This application is designed as a **semi-automated** system that requires human 
 └─────────────────┘
 ```
 
-### 🤖 Autonomous Self-Healing System (NEW!)
+### Autonomous Self-Healing System
 
-**7 AI DevOps Agents Monitoring 24/7:**
+**DevOps Agents Monitoring 24/7:**
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│            AUTONOMOUS MONITORING (Every 5 minutes)            │
+│            AUTONOMOUS MONITORING (Every 15 minutes)           │
 └────────────────────────┬─────────────────────────────────────┘
                          │
          ┌───────────────┴───────────────┐
-         │  Dr. James Harper             │
-         │  Health Monitor Agent         │
+         │  Health Monitor               │
          │  (Docker, DB, Redis, API)     │
          └───────────────┬───────────────┘
                          │
                          ▼
          ┌───────────────────────────────┐
-         │  Sarah Mitchell               │
-         │  Error Detection Agent        │
+         │  Error Detection              │
          │  (Log parsing & categorization)│
          └───────────────┬───────────────┘
                          │
                          ▼
          ┌───────────────────────────────┐
-         │  Dr. Marcus Chen              │
          │  Root Cause Analyst           │
          │  (85%+ confidence diagnosis)  │
          └───────────────┬───────────────┘
                          │
                          ▼
          ┌───────────────────────────────┐
-         │  Alex Thompson                │
          │  Fix Engineer                 │
          │  (Auto-apply code fixes)      │
          └───────────────┬───────────────┘
@@ -172,22 +168,16 @@ This application is designed as a **semi-automated** system that requires human 
          │  Backup & Validation          │
          │  (2-min validation window)    │
          │  (Auto-rollback on failure)   │
-         └───────────────┬───────────────┘
-                         │
-                         ▼
-         ┌───────────────────────────────┐
-         │  Learning Engine              │
-         │  (Improve from past fixes)    │
          └───────────────────────────────┘
 ```
 
 **Key Features:**
-- 🔄 Runs every 5 minutes automatically
-- 🎯 85% confidence threshold for auto-fixes
-- 💾 Automatic backups before changes
-- ✅ 2-minute validation after fixes
-- 🔙 Auto-rollback if fixes fail
-- 📈 Learns from outcomes to improve
+- Runs every 15 minutes automatically
+- 85% confidence threshold for auto-fixes
+- Automatic backups before changes
+- 2-minute validation after fixes
+- Auto-rollback if fixes fail
+- Learns from outcomes to improve
 
 **Monitoring Dashboard API:**
 - `GET /api/monitoring/health` - System health status
@@ -199,7 +189,7 @@ This application is designed as a **semi-automated** system that requires human 
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -212,7 +202,7 @@ This application is designed as a **semi-automated** system that requires human 
 
 1. **Clone or navigate to the repository:**
 ```bash
-cd C:\Users\timud\Documents\product-trend-automation
+cd /path/to/product-trend-automation
 ```
 
 2. **Create environment file:**
@@ -223,7 +213,7 @@ cp .env.example .env
 3. **Edit `.env` file and add your API credentials:**
 ```bash
 # Open in your text editor
-notepad .env
+nano .env  # or vim, code, etc.
 ```
 
 4. **Start the application with Docker:**
@@ -243,21 +233,26 @@ docker-compose exec backend python -c "from models.database import init_db; init
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### Required API Keys
 
-#### 1. AI Services (at least one required)
+#### 1. AI Services (Free Tier - Groq + Perplexity)
 
-**OpenAI (GPT-4):**
-1. Go to https://platform.openai.com/api-keys
+**Groq API (FREE):**
+1. Go to https://console.groq.com/
 2. Create new API key
-3. Add to `.env`: `OPENAI_API_KEY=sk-...`
+3. Add to `.env`: `GROQ_API_KEY=your_key_here`
 
-**Anthropic (Claude):**
-1. Go to https://console.anthropic.com/
+**Perplexity API:**
+1. Go to https://www.perplexity.ai/
 2. Create API key
-3. Add to `.env`: `ANTHROPIC_API_KEY=sk-ant-...`
+3. Add to `.env`: `PERPLEXITY_API_KEY=your_key_here`
+
+**HuggingFace (Optional):**
+1. Go to https://huggingface.co/settings/tokens
+2. Create access token
+3. Add to `.env`: `HUGGINGFACE_API_KEY=your_token_here`
 
 #### 2. Platform Integration (configure only the platforms you need)
 
@@ -319,16 +314,17 @@ TWITTER_BEARER_TOKEN=your_token
 
 ---
 
-## 📖 Usage Guide
+## Usage Guide
 
 ### Workflow
 
 1. **Automated Trend Discovery**
    - System automatically scans trend sources every hour
+   - Perplexity agent discovers trending keywords every 6 hours
    - Or manually trigger: Click "Scan Trends Now" in dashboard
 
 2. **AI Analysis**
-   - Discovered products are automatically analyzed by AI
+   - Discovered products are automatically analyzed by 11 AI agents
    - AI generates descriptions, keywords, pricing suggestions
    - Products move to "Pending Review" status
 
@@ -358,7 +354,7 @@ TWITTER_BEARER_TOKEN=your_token
 
 ---
 
-## 🛠️ Development
+## Development
 
 ### Running Locally (without Docker)
 
@@ -419,12 +415,14 @@ product-trend-automation/
 │   │   └── database.py          # Database models
 │   ├── services/
 │   │   ├── trend_discovery/
-│   │   │   └── trend_scanner.py # Trend scanning
+│   │   │   ├── trend_scanner.py         # Trend scanning
+│   │   │   └── perplexity_discovery.py  # Perplexity web search
 │   │   ├── ai_analysis/
-│   │   │   └── product_analyzer.py # AI analysis
+│   │   │   ├── agentic_system.py        # 12 AI agents
+│   │   │   └── product_analyzer.py      # AI analysis
 │   │   └── platform_integrations/
-│   │       └── platform_manager.py # Platform posting
-│   ├── agents/                   # 🤖 NEW: Autonomous DevOps agents
+│   │       └── platform_manager.py      # Platform posting
+│   ├── agents/                   # Autonomous DevOps agents
 │   │   └── devops/
 │   │       ├── autonomous_coordinator.py  # Main orchestrator
 │   │       ├── health_monitor.py          # System health checks
@@ -432,20 +430,20 @@ product-trend-automation/
 │   │       ├── root_cause_analyst.py      # Diagnosis
 │   │       ├── fix_engineer.py            # Auto-fix application
 │   │       └── learning_engine.py         # Learning from fixes
-│   ├── monitoring/               # 🤖 NEW: Monitoring infrastructure
+│   ├── monitoring/               # Monitoring infrastructure
 │   │   ├── health_checker.py     # Health check utilities
 │   │   ├── log_parser.py         # Log parsing & error detection
 │   │   └── metrics_collector.py  # System metrics collection
-│   ├── safety/                   # 🤖 NEW: Safety systems
+│   ├── safety/                   # Safety systems
 │   │   └── backup_manager.py     # Backup & rollback
-│   ├── routes/                   # 🤖 NEW: Monitoring API routes
+│   ├── routes/                   # Monitoring API routes
 │   │   └── monitoring_routes.py  # Monitoring dashboard endpoints
 │   ├── tasks/
 │   │   ├── celery_app.py        # Celery configuration
 │   │   ├── trend_tasks.py       # Trend scanning tasks
 │   │   ├── analysis_tasks.py    # AI analysis tasks
 │   │   ├── platform_tasks.py    # Platform sync tasks
-│   │   └── monitoring_tasks.py  # 🤖 NEW: Autonomous monitoring tasks
+│   │   └── monitoring_tasks.py  # Autonomous monitoring tasks
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── frontend/
@@ -470,7 +468,7 @@ product-trend-automation/
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Test Trend Scanning
 ```bash
@@ -487,9 +485,14 @@ curl -X POST http://localhost:8000/api/products/1/approve
 curl http://localhost:8000/api/analytics/dashboard
 ```
 
+### Check System Health
+```bash
+curl http://localhost:8000/api/monitoring/health
+```
+
 ---
 
-## 🔒 Security Best Practices
+## Security Best Practices
 
 1. **Never commit `.env` file** - Contains sensitive API keys
 2. **Use strong SECRET_KEY** - Generate random string for JWT tokens
@@ -501,7 +504,7 @@ curl http://localhost:8000/api/analytics/dashboard
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -537,9 +540,11 @@ curl http://localhost:8000/
 - Ensure account is in good standing
 - Review platform API documentation
 
+**For detailed troubleshooting, see [QUICK_REFERENCE.md](QUICK_REFERENCE.md) and [RESTART_GUIDE.md](RESTART_GUIDE.md)**
+
 ---
 
-## 📊 Performance Optimization
+## Performance Optimization
 
 - **Database indexes**: Already configured on frequently queried fields
 - **Caching**: Consider Redis caching for frequent queries
@@ -549,7 +554,7 @@ curl http://localhost:8000/
 
 ---
 
-## 🚢 Production Deployment
+## Production Deployment
 
 ### Recommended Stack
 - **Hosting**: AWS, Google Cloud, or DigitalOcean
@@ -568,16 +573,17 @@ SECRET_KEY=very-long-random-secure-key-here
 
 ---
 
-## 📝 License
+## License
 
 This project is provided as-is for educational and business purposes. Users are responsible for ensuring compliance with all applicable laws and platform terms of service.
 
 ---
 
-## 🤝 Support & Contributing
+## Support & Contributing
 
 ### Getting Help
 - Check this README thoroughly
+- Review [START_HERE.md](START_HERE.md) and [PROJECT_STATE.md](PROJECT_STATE.md)
 - Review API documentation at http://localhost:8000/docs
 - Check platform documentation for API issues
 
@@ -593,17 +599,18 @@ The creators of this software assume no liability for misuse, violations of term
 
 ---
 
-## 🎯 Roadmap
+## Roadmap
 
 ### Current Features
-- ✅ Multi-source trend discovery (29 trending product sources)
-- ✅ AI-powered product analysis (11-agent system)
-- ✅ Manual approval workflow
-- ✅ Multi-platform posting
-- ✅ Analytics dashboard
-- ✅ **Autonomous self-healing system (7 DevOps agents)**
-- ✅ **Automated error detection & fixing**
-- ✅ **Learning engine for continuous improvement**
+- [COMPLETE] Multi-source trend discovery (29 trending product sources)
+- [COMPLETE] AI-powered product analysis (12-agent system: 11 Groq + 1 Perplexity)
+- [COMPLETE] Manual approval workflow
+- [COMPLETE] Multi-platform posting
+- [COMPLETE] Analytics dashboard
+- [COMPLETE] **Autonomous self-healing system (DevOps agents)**
+- [COMPLETE] **Automated error detection & fixing**
+- [COMPLETE] **Learning engine for continuous improvement**
+- [COMPLETE] **Perplexity feedback loop for trend discovery**
 
 ### Future Enhancements
 - [ ] Advanced trend prediction with ML models

@@ -28,7 +28,9 @@
       "Bash(git ls-tree:*)",
       "Bash(git rm:*)",
       "Bash(git pull:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
